@@ -15,4 +15,6 @@ class students extends Model
         'grade',
         'email',
     ];
+
+    protected $table = "students";
 }
