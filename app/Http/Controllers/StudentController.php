@@ -3,41 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StudentStoreRequest;
-use App\Models\Students;
+use App\Models\Student;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class StudentController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Collection|Student[]
      */
     public function index()
     {
-        return Students::all();
+        return Student::all();
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param StudentStoreRequest $request
+     * @return JsonResponse
      */
-    public function store(StudentStoreRequest $request)
+    public function store(StudentStoreRequest $request): JsonResponse
     {
         try{
-            dd("ok");
-            $student = new Students();
+            $student = new Student();
             $student->first_name = $request->input('first_name');
             $student->last_name = $request->input('last_name');
             $student->grade = $request->input('grade');
             $student->address = $request->input('address');
             $student->email = $request->input('email');
-            $result = $student->save();
-            
-
-            return \response()->json('success',200);
+            $student->save();
+            return \response()->json('Successfully Saved!!!',200);
 
         }catch(\Exception $e){
             return \response()->json($e->getMassage(), 500);
@@ -47,26 +47,25 @@ class StudentController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
-        return Students::find($id);
+        return \response()->json(Student::find($id));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): JsonResponse
     {
         try{
-
-            $student = Students::find($id);
+            $student = Student::find($id);
             $student->first_name = $request->input('first_name');
             $student->last_name = $request->input('last_name');
             $student->grade = $request->input('grade');
@@ -74,10 +73,10 @@ class StudentController extends Controller
             $student->email = $request->input('email');
             $student->save();
 
-            return \response()->json('success',200);
+            return \response()->json('Successfully Updated!!!',200);
 
         }catch(\Exception $e){
-            return \response()->json($e->getMassage(), 500);
+            return \response()->json($e->getMessage(), 500);
         }
 
     }
@@ -85,11 +84,17 @@ class StudentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
-        return Students::destroy($id);
+        try {
+            $student = Student::find($id);
+            $student->delete();
+            return \response()->json('Successfully Deleted!!!',204);
+        } catch (\Exception $e){
+            return \response()->json($e->getMessage(), 500);
+        }
     }
 }
